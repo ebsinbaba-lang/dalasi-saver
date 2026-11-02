@@ -305,7 +305,7 @@
     </div>
 
     <script>
-        // Interactive UI Bindings
+                // Interactive UI Bindings
         const calculateBtn = document.getElementById('calculate-btn');
         const resultModal = document.getElementById('result-modal');
         const closeModalBtn = document.getElementById('close-modal-btn');
@@ -315,6 +315,58 @@
         // Automated Real-Time Wave SMS parsing pattern logic
         waveSmsInput.addEventListener('input', () => {
             const text = waveSmsInput.value;
-            // Matches numbers directly near standard Wave phrases like "sent", "paid", or "D"
             const match = text.match(/(?:sent|paid|D)\s*(\d+(?:\.\d+)?)/i) || text.match(/(\d+(?:\.\d+)?)\s*GMD/i);
             if (match && match[1]) {
+                manualSpendInput.value = Math.round(parseFloat(match[1]));
+            }
+        });
+
+        // Trigger live server calculations from our new backend engine
+        calculateBtn.addEventListener('click', async () => {
+            const income = document.getElementById('monthly-income').value || 0;
+            const spend = manualSpendInput.value || 0;
+
+            calculateBtn.innerText = "⚡ Fetching Analysis...";
+
+            try {
+                // Securely ping our serverless backend API route
+                const response = await fetch(`/api/budget?income=${income}&spend=${spend}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    alert(data.error);
+                    calculateBtn.innerText = "📊 Run Spending Analysis";
+                    return;
+                }
+
+                // Inject dynamic server data directly into our DOM layout placeholders
+                document.getElementById('res-food').innerText = `D${data.budgetBuckets.foodAndMaintenance.toLocaleString()}`;
+                document.getElementById('res-family').innerText = `D${data.budgetBuckets.familyFishMoney.toLocaleString()}`;
+                document.getElementById('res-transport').innerText = `D${data.budgetBuckets.transportation.toLocaleString()}`;
+                document.getElementById('res-savings').innerText = `D${data.budgetBuckets.secureSavings.toLocaleString()}`;
+                
+                const riceBags = data.civicGauge.bagsOfRiceStored;
+                document.getElementById('res-rice').innerText = `${riceBags} Bag${riceBags === 1 ? '' : 's'} of Rice`;
+
+                resultModal.style.display = 'flex';
+            } catch (err) {
+                console.error("Connection failed", err);
+            } finally {
+                calculateBtn.innerText = "📊 Run Spending Analysis";
+            }
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            resultModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === resultModal) {
+                resultModal.style.display = 'none';
+            }
+        });
+            </script>
+</body>
+</html>
+
+        
