@@ -305,7 +305,16 @@
     </div>
 
     <script>
-                // Interactive UI Bindings
+               // Activate and Register the Offline Service Worker Engine
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Offline Engine Active!', reg))
+                    .catch(err => console.error('Offline Engine Failed', err));
+            });
+        }
+
+        // Interactive UI Bindings
         const calculateBtn = document.getElementById('calculate-btn');
         const resultModal = document.getElementById('result-modal');
         const closeModalBtn = document.getElementById('close-modal-btn');
