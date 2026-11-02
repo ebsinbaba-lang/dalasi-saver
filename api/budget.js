@@ -1,10 +1,13 @@
 // api/budget.js
-// Smart Calculation Backend Engine for Dalasi Saver
+// Custom Travel Matrix Calculation Engine for Dalasi Saver
 
 export default async function handler(req, res) {
-    // 1. Grab data from the front-end securely
     const income = parseFloat(req.query.income) || 0;
     const spend = parseFloat(req.query.spend) || 0;
+    
+    // Catch custom fare query tokens from the frontend view layer
+    const oneWay = parseFloat(req.query.oneway) || 0;
+    const returnFare = parseFloat(req.query.returnf) || 0;
 
     if (income <= 0) {
         return res.status(200).json({
@@ -12,31 +15,36 @@ export default async function handler(req, res) {
         });
     }
 
-    // 2. Calculate net usable cash after immediate spending item
+    // 1. Calculate net usable cash after immediate spending item
     const netIncome = Math.max(0, income - spend);
 
-    // 3. Apply standard local budgeting division rules
-    const foodAllocation = Math.round(netIncome * 0.40);       // 40% for basic food items
-    const familySupport = Math.round(netIncome * 0.25);        // 25% for family fish money
-    const transportAllowance = Math.round(netIncome * 0.15);   // 15% for gelli-gellis / taxis
-    const emergencySavings = Math.round(netIncome * 0.20);     // 20% safe rainy day fund
+    // 2. Custom Matrix Rule: (One-Way + Return) × 26 working days a month
+    const dailyTravelCost = oneWay + returnFare;
+    const transportAllocation = Math.round(dailyTravelCost * 26); 
 
-    // 4. Calculate core macroeconomic civic metric
-    // Current average market price for a standard 50kg bag of rice is D2,500
+    // 3. Divide the remaining cash safely among other household needs
+    const remainingCash = Math.max(0, netIncome - transportAllocation);
+    
+    const foodAllocation = Math.round(remainingCash * 0.50);       // 50% of remainder for groceries
+    const familySupport = Math.round(remainingCash * 0.30);        // 30% of remainder for fish money
+    const emergencySavings = Math.round(remainingCash * 0.20);     // 20% of remainder for savings fund
+
+    // 4. Calculate core macroeconomic civic metric (D2,500 per bag)
     const COST_PER_RICE_BAG = 2500;
     const riceBagsSafetyScore = Math.floor(emergencySavings / COST_PER_RICE_BAG);
 
-    // 5. Return dynamic payload array securely to front-end mobile container
+    // 5. Return precise values securely back to mobile layout sheet
     return res.status(200).json({
         calculations: {
             originalIncome: income,
             deductedSpend: spend,
-            remainingNetIncome: netIncome
+            remainingNetIncome: netIncome,
+            calculatedMonthlyTransport: transportAllocation
         },
         budgetBuckets: {
             foodAndMaintenance: foodAllocation,
             familyFishMoney: familySupport,
-            transportation: transportAllowance,
+            transportation: transportAllocation,
             secureSavings: emergencySavings
         },
         civicGauge: {
