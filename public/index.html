@@ -253,6 +253,18 @@
                 <label for="monthly-income">Your Monthly Income (GMD)</label>
                 <input type="number" id="monthly-income" class="input-field" placeholder="Example: 15000" min="0">
             </div>
+                        <!-- Dynamic Accurate Transport Step -->
+            <div style="display: flex; gap: 12px; background: #edf2f7; padding: 12px; border-radius: 12px;">
+                <div class="input-group" style="flex: 1;">
+                    <label style="font-size: 12px; font-weight:600; color:#4a5568;">➡️ One-Way Fare (D)</label>
+                    <input type="number" id="oneway-fare" class="input-field" placeholder="e.g. 50" min="0">
+                </div>
+                <div class="input-group" style="flex: 1;">
+                    <label style="font-size: 12px; font-weight:600; color:#4a5568;">↩️ Return Fare (D)</label>
+                    <input type="number" id="return-fare" class="input-field" placeholder="e.g. 50" min="0">
+                </div>
+            </div>
+
 
             <!-- Optional Manual Expense Field -->
             <div class="input-group">
@@ -334,12 +346,15 @@
         calculateBtn.addEventListener('click', async () => {
             const income = document.getElementById('monthly-income').value || 0;
             const spend = manualSpendInput.value || 0;
+            const oneWay = document.getElementById('oneway-fare').value || 0;
+            const returnF = document.getElementById('return-fare').value || 0;
 
             calculateBtn.innerText = "⚡ Fetching Analysis...";
 
             try {
-                // Securely ping our serverless backend API route
-                const response = await fetch(`/api/budget?income=${income}&spend=${spend}`);
+                // Securely pass custom tracking variables up to our serverless API route
+                const response = await fetch(`/api/budget?income=${income}&spend=${spend}&oneway=${oneWay}&returnF=${returnF}`);
+
                 const data = await response.json();
 
                 if (data.error) {
