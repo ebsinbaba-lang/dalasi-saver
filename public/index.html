@@ -89,6 +89,34 @@
             color: #4a5568;
         }
 
+        /* Dynamic Header Row styling for handling layout positions cleanly */
+        .label-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .rollover-badge {
+            background-color: #ecfdf5;
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+
+        .rollover-badge:hover {
+            background-color: #10b981;
+            color: #ffffff;
+        }
+
         .input-field {
             width: 100%;
             padding: 14px 16px;
@@ -250,10 +278,16 @@
         <div class="content-body">
             <!-- Income Step -->
             <div class="input-group">
-                <label for="monthly-income">Your Monthly Income (GMD)</label>
+                <div class="label-row">
+                    <label for="monthly-income">Your Monthly Income (GMD)</label>
+                    <div id="rollover-action" class="rollover-badge" onclick="handleAutoRolloverIncome()" style="display: none;">
+                        🔄 Use Safety Balance
+                    </div>
+                </div>
                 <input type="number" id="monthly-income" class="input-field" placeholder="Example: 15000" min="0">
             </div>
-                        <!-- Dynamic Accurate Transport Step -->
+
+            <!-- Dynamic Accurate Transport Step -->
             <div style="display: flex; gap: 12px; background: #edf2f7; padding: 12px; border-radius: 12px;">
                 <div class="input-group" style="flex: 1;">
                     <label style="font-size: 12px; font-weight:600; color:#4a5568;">➡️ One-Way Fare (D)</label>
@@ -264,12 +298,12 @@
                     <input type="number" id="return-fare" class="input-field" placeholder="e.g. 50" min="0">
                 </div>
             </div>
-                        <!-- Dynamic Fish Money Input Step -->
+
+            <!-- Dynamic Fish Money Input Step -->
             <div class="input-group">
                 <label for="daily-fishmoney">🐟 Daily Fish Money Target (GMD)</label>
                 <input type="number" id="daily-fishmoney" class="input-field" placeholder="Example: 400 a day" min="0" value="400">
             </div>
-
 
             <!-- Optional Manual Expense Field -->
             <div class="input-group">
@@ -277,127 +311,18 @@
                 <input type="number" id="manual-spend" class="input-field" placeholder="Example: 150 for lunch" min="0">
             </div>
 
-            <!-- Intelligent Wave SMS Assistant Integration -->
+            <!-- Smart Parser Capture Field -->
             <div class="wave-section">
-                <label>🔵 Paste Wave SMS Text Snippet</label>
-                <textarea id="wave-sms-input" class="wave-textarea" placeholder="Paste the confirmation text from Wave here..."></textarea>
+                <label>📱 Wave Instant Copy-Paste Parser</label>
+                <textarea id="wave-paste" class="wave-textarea" placeholder="Paste full raw text message from Wave app here..."></textarea>
             </div>
 
-            <button type="button" class="btn-primary" id="calculate-btn">📊 Run Spending Analysis</button>
+            <!-- Execution Action Trigger Button -->
+            <button class="btn-primary" onclick="executeBudgetCalculation()">Calculate Budget Matrix</button>
         </div>
     </div>
 
-    <!-- Hidden Output Dashboard Modal -->
-    <div id="result-modal" class="modal-overlay">
+    <!-- Unified Output Dashboard Modal Overlay Section -->
+    <div id="dashboard-modal" class="modal-overlay">
         <div class="modal-sheet">
             <div class="modal-header">
-                <div class="modal-title">Your Savings Plan</div>
-                <button class="close-btn" id="close-modal-btn">&times;</button>
-            </div>
-            
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <span class="metric-label">Food & Basic Maintenance</span>
-                    <span class="metric-val" id="res-food">D0</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-label">Family Fish Money Allocation</span>
-                    <span class="metric-val" id="res-family">D0</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-label">Transport Allowance</span>
-                    <span class="metric-val" id="res-transport">D0</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-label">Calculated Safety Savings</span>
-                    <span class="metric-val" id="res-savings">D0</span>
-                </div>
-                <!-- Core Civic Metric Element -->
-                <div class="metric-card rice-card">
-                    <span class="metric-label">🌾 Family Safety Gauge</span>
-                    <span class="metric-val" id="res-rice">0 Bags of Rice</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-               // Activate and Register the Offline Service Worker Engine
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('Offline Engine Active!', reg))
-                    .catch(err => console.error('Offline Engine Failed', err));
-            });
-        }
-
-        // Interactive UI Bindings
-        const calculateBtn = document.getElementById('calculate-btn');
-        const resultModal = document.getElementById('result-modal');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        const waveSmsInput = document.getElementById('wave-sms-input');
-        const manualSpendInput = document.getElementById('manual-spend');
-
-        // Automated Real-Time Wave SMS parsing pattern logic
-        waveSmsInput.addEventListener('input', () => {
-            const text = waveSmsInput.value;
-            const match = text.match(/(?:sent|paid|D)\s*(\d+(?:\.\d+)?)/i) || text.match(/(\d+(?:\.\d+)?)\s*GMD/i);
-            if (match && match[1]) {
-                manualSpendInput.value = Math.round(parseFloat(match[1]));
-            }
-        });
-
-        // Trigger live server calculations from our new backend engine
-        calculateBtn.addEventListener('click', async () => {
-            const income = document.getElementById('monthly-income').value || 0;
-            const spend = manualSpendInput.value || 0;
-            const oneway = document.getElementById('oneway-fare').value || 0;
-            const returnF = document.getElementById('return-fare').value || 0;
-            const dailyFish = document.getElementById('daily-fishmoney').value || 0;
-
-            calculateBtn.innerText = "⚡ Fetching Analysis...";
-
-            try {
-                // Pass dynamic parameters up to the calculations engine
-                const response = await fetch(`/api/budget?income=${income}&spend=${spend}&oneway=${oneway}&returnf=${returnF}&fish=${dailyFish}`);
-
-
-                const data = await response.json();
-
-                if (data.error) {
-                    alert(data.error);
-                    calculateBtn.innerText = "📊 Run Spending Analysis";
-                    return;
-                }
-
-                // Inject dynamic server data directly into our DOM layout placeholders
-                document.getElementById('res-food').innerText = `D${data.budgetBuckets.foodAndMaintenance.toLocaleString()}`;
-                document.getElementById('res-family').innerText = `D${data.budgetBuckets.familyFishMoney.toLocaleString()}`;
-                document.getElementById('res-transport').innerText = `D${data.budgetBuckets.transportation.toLocaleString()}`;
-                document.getElementById('res-savings').innerText = `D${data.budgetBuckets.secureSavings.toLocaleString()}`;
-                
-                const riceBags = data.civicGauge.bagsOfRiceStored;
-                document.getElementById('res-rice').innerText = `${riceBags} Bag${riceBags === 1 ? '' : 's'} of Rice`;
-
-                resultModal.style.display = 'flex';
-            } catch (err) {
-                console.error("Connection failed", err);
-            } finally {
-                calculateBtn.innerText = "📊 Run Spending Analysis";
-            }
-        });
-
-        closeModalBtn.addEventListener('click', () => {
-            resultModal.style.display = 'none';
-        });
-
-        window.addEventListener('click', (e) => {
-            if (e.target === resultModal) {
-                resultModal.style.display = 'none';
-            }
-        });
-            </script>
-</body>
-</html>
-
-        
