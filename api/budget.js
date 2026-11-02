@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     
     // Catch custom fare query tokens from the frontend view layer
     const oneWay = parseFloat(req.query.oneway) || 0;
-    const returnFare = parseFloat(req.query.returnf) || 0;
+    const returnFare = parseFloat(req.query.returnF) || 0;
 
     if (income <= 0) {
         return res.status(200).json({
