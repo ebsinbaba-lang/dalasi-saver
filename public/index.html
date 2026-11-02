@@ -264,6 +264,11 @@
                     <input type="number" id="return-fare" class="input-field" placeholder="e.g. 50" min="0">
                 </div>
             </div>
+                        <!-- Dynamic Fish Money Input Step -->
+            <div class="input-group">
+                <label for="daily-fishmoney">🐟 Daily Fish Money Target (GMD)</label>
+                <input type="number" id="daily-fishmoney" class="input-field" placeholder="Example: 400 a day" min="0" value="400">
+            </div>
 
 
             <!-- Optional Manual Expense Field -->
@@ -346,14 +351,16 @@
         calculateBtn.addEventListener('click', async () => {
             const income = document.getElementById('monthly-income').value || 0;
             const spend = manualSpendInput.value || 0;
-            const oneWay = document.getElementById('oneway-fare').value || 0;
+            const oneway = document.getElementById('oneway-fare').value || 0;
             const returnF = document.getElementById('return-fare').value || 0;
+            const dailyFish = document.getElementById('daily-fishmoney').value || 0;
 
             calculateBtn.innerText = "⚡ Fetching Analysis...";
 
             try {
-                // Securely pass custom tracking variables up to our serverless API route
-                const response = await fetch(`/api/budget?income=${income}&spend=${spend}&oneway=${oneWay}&returnF=${returnF}`);
+                // Pass dynamic parameters up to the calculations engine
+                const response = await fetch(`/api/budget?income=${income}&spend=${spend}&oneway=${oneway}&returnf=${returnF}&fish=${dailyFish}`);
+
 
                 const data = await response.json();
 
