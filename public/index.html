@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dalasi Saver - Smart Budget Tracker</title>
+    
+    <!-- Mobile App Settings (PWA standard) -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1a2e40">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Dalasi Saver">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Locks screen size to feel like a mobile phone layout */
+        .phone-container {
+            width: 100%;
+            max-width: 420px;
+            background: #ffffff;
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+
+        /* Top Header branding area */
+        .app-header {
+            background: #1a2e40;
+            color: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+        }
+
+        .app-logo {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .app-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .app-header p {
+            font-size: 14px;
+            color: #a0aec0;
+            margin-top: 4px;
+        }
+
+        /* Form styling sections */
+        .content-body {
+            padding: 24px 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-field:focus {
+            border-color: #2b8a3e;
+        }
+
+        /* Wave Transaction specific area */
+        .wave-section {
+            background: #f7fafc;
+            border: 2px dashed #0098ea;
+            border-radius: 14px;
+            padding: 16px;
+            margin-top: 5px;
+        }
+
+        .wave-section label {
+            color: #0098ea;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+
+        .wave-textarea {
+            width: 100%;
+            height: 70px;
+            margin-top: 8px;
+            padding: 10px;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 13px;
+            resize: none;
+            outline: none;
+        }
+
+        /* Main action buttons */
+        .btn-primary {
+            width: 100%;
+            background: #2b8a3e;
+            color: #ffffff;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(43, 138, 62, 0.2);
+            transition: background 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #237032;
+        }
+
+        /* Pop-up Dashboard Overlay Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 1000;
+        }
+
+        .modal-sheet {
+            width: 100%;
+            max-width: 420px;
+            background: #ffffff;
+            border-top-left-radius: 28px;
+            border-top-right-radius: 28px;
+            padding: 30px 24px;
+            box-shadow: 0 -4px 25px rgba(0,0,0,0.15);
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #edf2f7;
+            padding-bottom: 12px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a2e40;
+        }
+
+        .close-btn {
+            font-size: 24px;
+            color: #a0aec0;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        /* Metrics grid for analysis */
+        .metrics-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 5px solid #2b8a3e;
+        }
+
+        .metric-card.rice-card {
+            background: #fffaf0;
+            border-left-color: #dd6b20;
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .metric-val {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a2e40;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+        <!-- Top App Header -->
+        <div class="app-header">
+            <div class="app-logo">💰</div>
+            <h1>Dalasi Saver</h1>
+            <p>Smart Local Budgeting & Wave Assistant</p>
+        </div>
+
+        <!-- Main Workspace Area -->
+        <div class="content-body">
+            <!-- Income Step -->
+            <div class="input-group">
+                <label for="monthly-income">Your Monthly Income (GMD)</label>
+                <input type="number" id="monthly-income" class="input-field" placeholder="Example: 15000" min="0">
+            </div>
+
+            <!-- Optional Manual Expense Field -->
+            <div class="input-group">
+                <label for="manual-spend">New Cash Spending Item (GMD)</label>
+                <input type="number" id="manual-spend" class="input-field" placeholder="Example: 150 for lunch" min="0">
+            </div>
+
+            <!-- Intelligent Wave SMS Assistant Integration -->
+            <div class="wave-section">
+                <label>🔵 Paste Wave SMS Text Snippet</label>
+                <textarea id="wave-sms-input" class="wave-textarea" placeholder="Paste the confirmation text from Wave here..."></textarea>
+            </div>
+
+            <button type="button" class="btn-primary" id="calculate-btn">📊 Run Spending Analysis</button>
+        </div>
+    </div>
+
+    <!-- Hidden Output Dashboard Modal -->
+    <div id="result-modal" class="modal-overlay">
+        <div class="modal-sheet">
+            <div class="modal-header">
+                <div class="modal-title">Your Savings Plan</div>
+                <button class="close-btn" id="close-modal-btn">&times;</button>
+            </div>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <span class="metric-label">Food & Basic Maintenance</span>
+                    <span class="metric-val" id="res-food">D0</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Family Fish Money Allocation</span>
+                    <span class="metric-val" id="res-family">D0</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Transport Allowance</span>
+                    <span class="metric-val" id="res-transport">D0</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Calculated Safety Savings</span>
+                    <span class="metric-val" id="res-savings">D0</span>
+                </div>
+                <!-- Core Civic Metric Element -->
+                <div class="metric-card rice-card">
+                    <span class="metric-label">🌾 Family Safety Gauge</span>
+                    <span class="metric-val" id="res-rice">0 Bags of Rice</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Interactive UI Bindings
+        const calculateBtn = document.getElementById('calculate-btn');
+        const resultModal = document.getElementById('result-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const waveSmsInput = document.getElementById('wave-sms-input');
+        const manualSpendInput = document.getElementById('manual-spend');
+
+        // Automated Real-Time Wave SMS parsing pattern logic
+        waveSmsInput.addEventListener('input', () => {
+            const text = waveSmsInput.value;
+            // Matches numbers directly near standard Wave phrases like "sent", "paid", or "D"
+            const match = text.match(/(?:sent|paid|D)\s*(\d+(?:\.\d+)?)/i) || text.match(/(\d+(?:\.\d+)?)\s*GMD/i);
+            if (match && match[1]) {
