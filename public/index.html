@@ -250,6 +250,7 @@
                 <input type="number" id="monthly-income" class="input-field" placeholder="Example: 15000" min="0">
             </div>
 
+            <!-- Transport Fares -->
             <div style="display: flex; gap: 12px; background: #edf2f7; padding: 12px; border-radius: 12px;">
                 <div class="input-group" style="flex: 1;">
                     <label style="font-size: 12px; font-weight:600; color:#4a5568;">➡️ One-Way Fare (D)</label>
@@ -258,6 +259,18 @@
                 <div class="input-group" style="flex: 1;">
                     <label style="font-size: 12px; font-weight:600; color:#4a5568;">↩️ Return Fare (D)</label>
                     <input type="number" id="return-fare" class="input-field" placeholder="e.g. 50" min="0">
+                </div>
+            </div>
+
+            <!-- Optional Monthly Rent & Weekly Cashpower -->
+            <div style="display: flex; gap: 12px; background: #edf2f7; padding: 12px; border-radius: 12px;">
+                <div class="input-group" style="flex: 1;">
+                    <label for="monthly-rent" style="font-size: 12px; font-weight:600; color:#4a5568;">🏠 Monthly Rent (Optional)</label>
+                    <input type="number" id="monthly-rent" class="input-field" placeholder="e.g. 5000" min="0">
+                </div>
+                <div class="input-group" style="flex: 1;">
+                    <label for="weekly-cashpower" style="font-size: 12px; font-weight:600; color:#4a5568;">⚡ Weekly Cashpower (D)</label>
+                    <input type="number" id="weekly-cashpower" class="input-field" placeholder="e.g. 500" min="0">
                 </div>
             </div>
 
@@ -299,24 +312,3 @@
                 </div>
                 <div class="metric-card">
                     <span class="metric-label">Family Fish Money Allocation</span>
-                    <span class="metric-val" id="res-family">D0</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-label">Transport Allowance</span>
-                    <span class="metric-val" id="res-transport">D0</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-label">Calculated Safety Savings</span>
-                    <span class="metric-val" id="res-savings">D0</span>
-                </div>
-                <div class="metric-card rice-card">
-                    <span class="metric-label">🌾 Family Safety Gauge</span>
-                    <span class="metric-val" id="res-rice">0 Bags of Rice</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
