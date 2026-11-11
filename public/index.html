@@ -28,7 +28,6 @@
             min-height: 100vh;
         }
 
-        /* Locks screen size to feel like a mobile phone layout */
         .phone-container {
             width: 100%;
             max-width: 420px;
@@ -41,7 +40,6 @@
             overflow-y: auto;
         }
 
-        /* Top Header branding area */
         .app-header {
             background: #1a2e40;
             color: #ffffff;
@@ -68,7 +66,6 @@
             margin-top: 4px;
         }
 
-        /* Form styling sections */
         .content-body {
             padding: 24px 20px;
             flex-grow: 1;
@@ -103,7 +100,6 @@
             border-color: #2b8a3e;
         }
 
-        /* Wave Transaction specific area */
         .wave-section {
             background: #f7fafc;
             border: 2px dashed #0098ea;
@@ -139,7 +135,6 @@
             min-height: 16px;
         }
 
-        /* Main action buttons */
         .btn-primary {
             width: 100%;
             background: #2b8a3e;
@@ -158,7 +153,6 @@
             background: #237032;
         }
 
-        /* Pop-up Dashboard Overlay Modal */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -207,7 +201,6 @@
             background: none;
         }
 
-        /* Metrics grid for analysis */
         .metrics-grid {
             display: flex;
             flex-direction: column;
@@ -246,22 +239,18 @@
 <body>
 
     <div class="phone-container">
-        <!-- Top App Header -->
         <div class="app-header">
             <div class="app-logo">💰</div>
             <h1>Dalasi Saver</h1>
             <p>Smart Local Budgeting & Wave Assistant</p>
         </div>
 
-        <!-- Main Workspace Area -->
         <div class="content-body">
-            <!-- Income Step -->
             <div class="input-group">
                 <label for="monthly-income">Your Monthly Income (GMD)</label>
                 <input type="number" id="monthly-income" class="input-field" placeholder="Example: 15000" min="0">
             </div>
 
-            <!-- Dynamic Accurate Transport Step -->
             <div style="display: flex; gap: 12px; background: #edf2f7; padding: 12px; border-radius: 12px;">
                 <div class="input-group" style="flex: 1;">
                     <label style="font-size: 12px; font-weight:600; color:#4a5568;">➡️ One-Way Fare (D)</label>
@@ -273,19 +262,16 @@
                 </div>
             </div>
 
-            <!-- Dynamic Fish Money Input Step -->
             <div class="input-group">
                 <label for="daily-fishmoney">🐟 Daily Fish Money Target (GMD)</label>
                 <input type="number" id="daily-fishmoney" class="input-field" placeholder="Example: 400 a day" min="0">
             </div>
 
-            <!-- Optional Manual Expense Field -->
             <div class="input-group">
                 <label for="manual-spend">New Cash Spending Item (GMD)</label>
                 <input type="number" id="manual-spend" class="input-field" placeholder="Example: 150 for lunch" min="0">
             </div>
 
-            <!-- Intelligent Wave SMS Assistant Integration -->
             <div class="wave-section">
                 <label>🔵 Paste Wave SMS Text Snippet</label>
                 <textarea id="wave-sms-input" class="wave-textarea" placeholder="Paste the confirmation text from Wave here..."></textarea>
@@ -296,7 +282,6 @@
         </div>
     </div>
 
-    <!-- Hidden Output Dashboard Modal -->
     <div id="result-modal" class="modal-overlay">
         <div class="modal-sheet">
             <div class="modal-header">
@@ -319,3 +304,19 @@
                 </div>
                 <div class="metric-card">
                     <span class="metric-label">Transport Allowance</span>
+                    <span class="metric-val" id="res-transport">D0</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Calculated Safety Savings</span>
+                    <span class="metric-val" id="res-savings">D0</span>
+                </div>
+                <div class="metric-card rice-card">
+                    <span class="metric-label">🌾 Family Safety Gauge</span>
+                    <span class="metric-val" id="res-rice">0 Bags of Rice</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if ('serviceWorker' in navigator) {
