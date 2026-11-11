@@ -240,65 +240,50 @@ window.addEventListener('click', (e) => {
     }
 });
 
-// Direct File Download (Saves standalone Dalasi-Saver.html to Downloads folder)
+// Register Service Worker for Offline & Home Screen App Support
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+}
+
+// Home Screen Install Banner (Auto-hides once installed on Home Screen)
+let deferredInstallPrompt = null;
 const installBanner = document.getElementById('install-banner');
 const installAppBtn = document.getElementById('install-app-btn');
 const dismissInstallBtn = document.getElementById('dismiss-install-btn');
 
-// Detect if opened from a local downloaded file or standalone mode
-const isLocalFile = window.location.protocol === 'file:';
 const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
-if (!isLocalFile && !isStandalone && installBanner) {
+if (!isStandalone && installBanner) {
     installBanner.style.display = 'flex';
 
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+    });
+
     installAppBtn.addEventListener('click', async () => {
-        installAppBtn.innerText = 'Downloading...';
-        try {
-            const [cssRes, jsRes] = await Promise.all([
-                fetch('/style.css'),
-                fetch('/app.js')
-            ]);
-            const cssText = await cssRes.text();
-            const jsText = await jsRes.text();
-
-            // Clone current page and bundle CSS + JS inline for 100% offline use
-            const docClone = document.documentElement.cloneNode(true);
-            const bannerInClone = docClone.querySelector('#install-banner');
-            if (bannerInClone) bannerInClone.remove();
-
-            const extCss = docClone.querySelector('link[href="/style.css"]');
-            if (extCss) {
-                const inlineStyle = document.createElement('style');
-                inlineStyle.textContent = cssText;
-                extCss.replaceWith(inlineStyle);
+        if (deferredInstallPrompt) {
+            deferredInstallPrompt.prompt();
+            const { outcome } = await deferredInstallPrompt.userChoice;
+            if (outcome === 'accepted') {
+                installBanner.style.display = 'none';
             }
-
-            const extScript = docClone.querySelector('script[src="/app.js"]');
-            if (extScript) {
-                const inlineScript = document.createElement('script');
-                inlineScript.textContent = jsText;
-                extScript.replaceWith(inlineScript);
+            deferredInstallPrompt = null;
+        } else {
+            const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+            if (isIOS) {
+                alert('To add to your iPhone Home Screen:\n1. Tap the Share button (⎋) at the bottom of Safari.\n2. Tap "Add to Home Screen".');
+            } else {
+                alert('To add to your Home Screen:\n1. Tap the browser menu (⋮) in the top-right corner.\n2. Tap "Install app" or "Add to Home screen".');
             }
-
-            const fullHtml = '<!DOCTYPE html>\n' + docClone.outerHTML;
-            const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
-            const downloadUrl = URL.createObjectURL(blob);
-
-            const link = document.createElement('a');
-            link.href = downloadUrl;
-            link.download = 'Dalasi-Saver.html';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(downloadUrl);
-
-            installBanner.style.display = 'none';
-        } catch (err) {
-            alert('Download failed. Please check your connection and try again.');
-        } finally {
-            installAppBtn.innerText = 'Download';
         }
+    });
+
+    window.addEventListener('appinstalled', () => {
+        installBanner.style.display = 'none';
+        deferredInstallPrompt = null;
     });
 
     dismissInstallBtn.addEventListener('click', () => {
