@@ -11,6 +11,21 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Dalasi Saver">
+    <style>
+        .freq-btn.active {
+            background: #2b8a3e !important;
+            color: #ffffff !important;
+            border-color: #2b8a3e !important;
+            box-shadow: 0 2px 6px rgba(43, 138, 62, 0.25);
+        }
+        .freq-feedback {
+            font-size: 11px;
+            font-weight: 600;
+            color: #2b8a3e;
+            margin-top: 5px;
+            display: block;
+        }
+    </style>
 </head>
 <body>
 
@@ -68,9 +83,10 @@
                     <div class="cashpower-prompt-box">
                         <span class="cashpower-prompt-title">Is Cashpower Weekly or Daily?</span>
                         <div class="freq-pills">
-                            <button type="button" class="freq-btn active" id="freq-weekly">Weekly (×4)</button>
-                            <button type="button" class="freq-btn" id="freq-daily">Daily (×30)</button>
+                            <button type="button" class="freq-btn active" id="freq-weekly">Weekly</button>
+                            <button type="button" class="freq-btn" id="freq-daily">Daily</button>
                         </div>
+                        <span class="freq-feedback" id="freq-feedback">✓ Weekly Cashpower selected</span>
                     </div>
                 </div>
             </div>
@@ -150,14 +166,6 @@
     </div>
 
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => reg.update())
-                    .catch(err => console.error('Offline Engine Failed', err));
-            });
-        }
-
         const STORAGE_KEY = 'dalasi_saver_ledger_v1';
         const VISIBILITY_KEY = 'dalasi_saver_show_balance';
         let pendingBalanceToSave = null;
@@ -172,6 +180,7 @@
 
         const freqWeeklyBtn = document.getElementById('freq-weekly');
         const freqDailyBtn = document.getElementById('freq-daily');
+        const freqFeedback = document.getElementById('freq-feedback');
 
         const savedBanner = document.getElementById('saved-banner');
         const savedBalanceDisplay = document.getElementById('saved-balance-display');
@@ -190,25 +199,13 @@
             selectedCashpowerFreq = 'weekly';
             freqWeeklyBtn.classList.add('active');
             freqDailyBtn.classList.remove('active');
+            freqFeedback.innerText = '✓ Weekly Cashpower selected';
         });
 
         freqDailyBtn.addEventListener('click', () => {
             selectedCashpowerFreq = 'daily';
             freqDailyBtn.classList.add('active');
             freqWeeklyBtn.classList.remove('active');
+            freqFeedback.innerText = '✓ Daily Cashpower selected';
         });
-
-        function getSavedLedger() {
-            try {
-                const raw = localStorage.getItem(STORAGE_KEY);
-                return raw ? JSON.parse(raw) : null;
-            } catch (e) {
-                return null;
-            }
-        }
-
-        function isBalanceVisible() {
-            const pref = localStorage.getItem(VISIBILITY_KEY);
-            return pref === null ? true : pref === 'true';
-        }
 
