@@ -165,47 +165,6 @@
         </div>
     </div>
 
-    <script>
-        const STORAGE_KEY = 'dalasi_saver_ledger_v1';
-        const VISIBILITY_KEY = 'dalasi_saver_show_balance';
-        let pendingBalanceToSave = null;
-        let selectedCashpowerFreq = 'weekly';
-
-        const calculateBtn = document.getElementById('calculate-btn');
-        const resultModal = document.getElementById('result-modal');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        const savePlanBtn = document.getElementById('save-plan-btn');
-        const cancelPlanBtn = document.getElementById('cancel-plan-btn');
-        const resetStorageBtn = document.getElementById('reset-storage-btn');
-
-        const freqWeeklyBtn = document.getElementById('freq-weekly');
-        const freqDailyBtn = document.getElementById('freq-daily');
-        const freqFeedback = document.getElementById('freq-feedback');
-
-        const savedBanner = document.getElementById('saved-banner');
-        const savedBalanceDisplay = document.getElementById('saved-balance-display');
-        const toggleVisibilityCheckbox = document.getElementById('toggle-balance-visibility');
-        const visibilityText = document.getElementById('visibility-text');
-        const incomeLabel = document.getElementById('income-label');
-
-        const waveSmsInput = document.getElementById('wave-sms-input');
-        const waveStatus = document.getElementById('wave-status');
-        const incomeInput = document.getElementById('monthly-income');
-        const manualSpendInput = document.getElementById('manual-spend');
-
-        let lastParsedSms = '';
-
-        freqWeeklyBtn.addEventListener('click', () => {
-            selectedCashpowerFreq = 'weekly';
-            freqWeeklyBtn.classList.add('active');
-            freqDailyBtn.classList.remove('active');
-            freqFeedback.innerText = '✓ Weekly Cashpower selected';
-        });
-
-        freqDailyBtn.addEventListener('click', () => {
-            selectedCashpowerFreq = 'daily';
-            freqDailyBtn.classList.add('active');
-            freqWeeklyBtn.classList.remove('active');
-            freqFeedback.innerText = '✓ Daily Cashpower selected';
-        });
-
+    <script src="/app.js"></script>
+</body>
+</html>
