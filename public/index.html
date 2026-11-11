@@ -214,16 +214,58 @@
 
         .input-field {
             width: 100%;
-            padding: 14px 16px;
+            padding: 14px 14px;
             border: 2px solid #e2e8f0;
             border-radius: 12px;
-            font-size: 16px;
+            font-size: 15px;
+            background: #ffffff;
             outline: none;
             transition: border-color 0.2s;
         }
 
         .input-field:focus {
             border-color: #2b8a3e;
+        }
+
+        /* Cashpower Weekly / Daily Prompt Box */
+        .cashpower-prompt-box {
+            background: #ffffff;
+            border: 1px solid #cbd5e0;
+            border-radius: 10px;
+            padding: 8px 10px;
+            margin-top: 6px;
+        }
+
+        .cashpower-prompt-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #4a5568;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .freq-pills {
+            display: flex;
+            gap: 6px;
+        }
+
+        .freq-btn {
+            flex: 1;
+            padding: 7px 6px;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 8px;
+            border: 1px solid #cbd5e0;
+            background: #f7fafc;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .freq-btn.active {
+            background: #1a2e40;
+            color: #ffffff;
+            border-color: #1a2e40;
         }
 
         .wave-section {
@@ -362,51 +404,3 @@
         }
 
         .save-prompt-box {
-            background: #f7fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 16px;
-            text-align: center;
-        }
-
-        .save-prompt-box p {
-            font-size: 13px;
-            color: #4a5568;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .prompt-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-save {
-            flex: 1;
-            background: #1a2e40;
-            color: #ffffff;
-            border: none;
-            padding: 13px;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .btn-cancel {
-            flex: 1;
-            background: #edf2f7;
-            color: #4a5568;
-            border: none;
-            padding: 13px;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="phone-container">
-        <div class="app-header">
