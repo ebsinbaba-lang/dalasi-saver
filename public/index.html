@@ -1,325 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dalasi Saver - Smart Budget Tracker</title>
-
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#1a2e40">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Dalasi Saver">
-
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-
-        body {
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .phone-container {
-            width: 100%;
-            max-width: 420px;
-            background: #ffffff;
-            min-height: 100vh;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            overflow-y: auto;
-        }
-
-        .app-header {
-            background: #1a2e40;
-            color: #ffffff;
-            padding: 30px 20px;
-            text-align: center;
-            border-bottom-left-radius: 24px;
-            border-bottom-right-radius: 24px;
-        }
-
-        .app-logo {
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-
-        .app-header h1 {
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-
-        .app-header p {
-            font-size: 14px;
-            color: #a0aec0;
-            margin-top: 4px;
-        }
-
-        .content-body {
-            padding: 24px 20px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-
-        .saved-banner {
-            display: none;
-            background: #ebf8ff;
-            border: 2px solid #3182ce;
-            border-radius: 14px;
-            padding: 14px 16px;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .saved-banner.negative {
-            background: #fff5f5;
-            border-color: #e53e3e;
-        }
-
-        .saved-top-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .saved-info small {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: #4a5568;
-        }
-
-        .saved-info strong {
-            font-size: 20px;
-            color: #1a2e40;
-            letter-spacing: 0.5px;
-        }
-
-        .saved-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 1px solid rgba(0, 0, 0, 0.08);
-            padding-top: 8px;
-        }
-
-        .toggle-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #4a5568;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 38px;
-            height: 20px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #cbd5e0;
-            transition: 0.25s;
-            border-radius: 20px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 14px;
-            width: 14px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: 0.25s;
-            border-radius: 50%;
-        }
-
-        .switch input:checked + .slider {
-            background-color: #2b8a3e;
-        }
-
-        .switch input:checked + .slider:before {
-            transform: translateX(18px);
-        }
-
-        .btn-reset {
-            background: #ffffff;
-            border: 1px solid #cbd5e0;
-            color: #4a5568;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 5px 10px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .input-group label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #4a5568;
-        }
-
-        .row-box {
-            display: flex;
-            gap: 12px;
-            background: #edf2f7;
-            padding: 12px;
-            border-radius: 12px;
-        }
-
-        .row-box .input-group {
-            flex: 1;
-        }
-
-        .row-box .input-group label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #4a5568;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 14px 14px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 15px;
-            background: #ffffff;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .input-field:focus {
-            border-color: #2b8a3e;
-        }
-
-        .cashpower-prompt-box {
-            background: #ffffff;
-            border: 1px solid #cbd5e0;
-            border-radius: 10px;
-            padding: 8px 10px;
-            margin-top: 6px;
-        }
-
-        .cashpower-prompt-title {
-            font-size: 11px;
-            font-weight: 700;
-            color: #4a5568;
-            margin-bottom: 6px;
-            display: block;
-        }
-
-        .freq-pills {
-            display: flex;
-            gap: 6px;
-        }
-
-        .freq-btn {
-            flex: 1;
-            padding: 7px 6px;
-            font-size: 12px;
-            font-weight: 700;
-            border-radius: 8px;
-            border: 1px solid #cbd5e0;
-            background: #f7fafc;
-            color: #4a5568;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .freq-btn.active {
-            background: #1a2e40;
-            color: #ffffff;
-            border-color: #1a2e40;
-        }
-
-        .wave-section {
-            background: #f7fafc;
-            border: 2px dashed #0098ea;
-            border-radius: 14px;
-            padding: 16px;
-            margin-top: 5px;
-        }
-
-        .wave-section label {
-            color: #0098ea;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 600;
-        }
-
-        .wave-textarea {
-            width: 100%;
-            height: 70px;
-            margin-top: 8px;
-            padding: 10px;
-            border: 1px solid #cbd5e0;
-            border-radius: 8px;
-            font-size: 13px;
-            resize: none;
-            outline: none;
-        }
-
-        .wave-status {
-            font-size: 12px;
-            font-weight: 600;
-            margin-top: 8px;
-            min-height: 16px;
-        }
-
-        .btn-primary {
-            width: 100%;
-            background: #2b8a3e;
-            color: #ffffff;
-            border: none;
-            padding: 16px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(43, 138, 62, 0.2);
-            transition: background 0.2s;
-        }
-
-        .btn-primary:hover {
-            background: #237032;
-        }
-
         .modal-overlay {
             display: none;
             position: fixed;
@@ -406,3 +84,185 @@
             background: #f7fafc;
             border: 1px solid #e2e8f0;
             border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .save-prompt-box p {
+            font-size: 13px;
+            color: #4a5568;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .prompt-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-save {
+            flex: 1;
+            background: #1a2e40;
+            color: #ffffff;
+            border: none;
+            padding: 13px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            background: #edf2f7;
+            color: #4a5568;
+            border: none;
+            padding: 13px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+        <div class="app-header">
+            <div class="app-logo">💰</div>
+            <h1>Dalasi Saver</h1>
+            <p>Smart Local Budgeting & Wave Assistant</p>
+        </div>
+
+        <div class="content-body">
+            <div class="saved-banner" id="saved-banner">
+                <div class="saved-top-row">
+                    <div class="saved-info">
+                        <small>💾 Saved Remaining Balance</small>
+                        <strong id="saved-balance-display">D0</strong>
+                    </div>
+                    <button type="button" class="btn-reset" id="reset-storage-btn">Reset</button>
+                </div>
+                <div class="saved-controls">
+                    <label class="toggle-label" for="toggle-balance-visibility">
+                        <span class="switch">
+                            <input type="checkbox" id="toggle-balance-visibility" checked>
+                            <span class="slider"></span>
+                        </span>
+                        <span id="visibility-text">👁️ Show Saved Balance</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="monthly-income" id="income-label">Your Monthly Income (GMD)</label>
+                <input type="number" id="monthly-income" class="input-field" placeholder="Example: 15000" min="0">
+            </div>
+
+            <div class="row-box">
+                <div class="input-group">
+                    <label for="oneway-fare">➡️ One-Way Fare (D)</label>
+                    <input type="number" id="oneway-fare" class="input-field" placeholder="e.g. 50" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="return-fare">↩️ Return Fare (D)</label>
+                    <input type="number" id="return-fare" class="input-field" placeholder="e.g. 50" min="0">
+                </div>
+            </div>
+
+            <div class="row-box">
+                <div class="input-group" style="flex: 0.9;">
+                    <label for="monthly-rent">🏠 Monthly Rent</label>
+                    <input type="number" id="monthly-rent" class="input-field" placeholder="Optional" min="0">
+                </div>
+                <div class="input-group" style="flex: 1.2;">
+                    <label for="cashpower-amount">⚡ Cashpower (D)</label>
+                    <input type="number" id="cashpower-amount" class="input-field" placeholder="e.g. 500" min="0">
+                    <div class="cashpower-prompt-box">
+                        <span class="cashpower-prompt-title">Is Cashpower Weekly or Daily?</span>
+                        <div class="freq-pills">
+                            <button type="button" class="freq-btn active" id="freq-weekly">Weekly (×4)</button>
+                            <button type="button" class="freq-btn" id="freq-daily">Daily (×30)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row-box">
+                <div class="input-group">
+                    <label for="daily-fishmoney">🐟 Daily Fish Money</label>
+                    <input type="number" id="daily-fishmoney" class="input-field" placeholder="e.g. 400" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="food-maintenance">🍚 Food & Upkeep</label>
+                    <input type="number" id="food-maintenance" class="input-field" placeholder="e.g. 4000" min="0">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="manual-spend">New Cash Spending Item (GMD)</label>
+                <input type="number" id="manual-spend" class="input-field" placeholder="Example: 150 for lunch" min="0">
+            </div>
+
+            <div class="wave-section">
+                <label for="wave-sms-input">🔵 Paste Wave SMS Text Snippet</label>
+                <textarea id="wave-sms-input" class="wave-textarea" placeholder="Paste the confirmation text from Wave here..."></textarea>
+                <div id="wave-status" class="wave-status"></div>
+            </div>
+
+            <button type="button" class="btn-primary" id="calculate-btn">📊 Run Spending Analysis</button>
+        </div>
+    </div>
+
+    <div id="result-modal" class="modal-overlay">
+        <div class="modal-sheet">
+            <div class="modal-header">
+                <div class="modal-title">Your Savings Plan</div>
+                <button type="button" class="close-btn" id="close-modal-btn">&times;</button>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-card" id="balance-card">
+                    <span class="metric-label">Remaining Salary Balance</span>
+                    <span class="metric-val" id="res-balance">D0</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Total Deductions This Run</span>
+                    <span class="metric-val" id="res-outflow">D0</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Food & Basic Maintenance</span>
+                    <span class="metric-val" id="res-food">D0</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Family Fish Money Allocation</span>
+                    <span class="metric-val" id="res-family">D0</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Transport Allowance</span>
+                    <span class="metric-val" id="res-transport">D0</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Rent & Cashpower (Monthly)</span>
+                    <span class="metric-val" id="res-bills">D0</span>
+                </div>
+                <div class="metric-card rice-card">
+                    <span class="metric-label">🌾 Family Safety Gauge</span>
+                    <span class="metric-val" id="res-rice">0 Bags of Rice</span>
+                </div>
+            </div>
+
+            <div class="save-prompt-box">
+                <p>Save this remaining balance to your device to track future spending?</p>
+                <div class="prompt-actions">
+                    <button type="button" class="btn-save" id="save-plan-btn">💾 Save Balance</button>
+                    <button type="button" class="btn-cancel" id="cancel-plan-btn">✖️ Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
