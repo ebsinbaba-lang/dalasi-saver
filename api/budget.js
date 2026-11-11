@@ -1,14 +1,14 @@
 // api/budget.js
-// Dynamic Calculations Engine with Custom Travel & Real Fish Money Inputs
+// Dynamic Calculations Engine with Custom Travel, Real Fish Money & Deficit Tracking
 
 export default async function handler(req, res) {
     const income = parseFloat(req.query.income) || 0;
     const spend = parseFloat(req.query.spend) || 0;
     const oneWay = parseFloat(req.query.oneway) || 0;
     const returnFare = parseFloat(req.query.returnf) || 0;
-    
-    // Catch the custom daily fish money baseline from the mobile interface
-    const dailyFishMoney = parseFloat(req.query.fish) || 400; 
+
+    // Catch the custom daily fish money baseline (defaults to 0 if left blank)
+    const dailyFishMoney = parseFloat(req.query.fish) || 0;
 
     if (income <= 0) {
         return res.status(200).json({
@@ -16,20 +16,20 @@ export default async function handler(req, res) {
         });
     }
 
-    // 1. Core Net income baseline calculation
-    const netIncome = Math.max(0, income - spend);
+    // 1. Transport cost formula matrix: (One-way + Return) x 26 working days
+    const transportAllocation = Math.round((oneWay + returnFare) * 26);
 
-    // 2. Transport cost formula matrix: (One-Way + Return) × 26 working days
-    const transportAllocation = Math.round((oneWay + returnFare) * 26); 
-
-    // 3. Fish Money calculation: Daily target input × 30 calendar days
+    // 2. Fish Money calculation: Daily target input x 30 calendar days
     const totalMonthlyFishMoney = Math.round(dailyFishMoney * 30);
 
-    // 4. Divide remaining cash securely between dry groceries and savings
-    const remainingCash = Math.max(0, netIncome - transportAllocation - totalMonthlyFishMoney);
-    
-    const foodAllocation = Math.round(remainingCash * 0.60);       // 60% of remaining pool for bulk groceries
-    const emergencySavings = Math.round(remainingCash * 0.40);     // 40% of remaining pool saved securely
+    // 3. True Net Remaining Balance (can go negative, e.g. -1000)
+    const totalCommitted = spend + transportAllocation + totalMonthlyFishMoney;
+    const rawBalance = Math.round(income - totalCommitted);
+
+    // 4. Divide positive remaining cash between dry groceries (60%) and savings (40%)
+    const positivePool = Math.max(0, rawBalance);
+    const foodAllocation = Math.round(positivePool * 0.60);
+    const emergencySavings = Math.round(positivePool * 0.40);
 
     // 5. Civic safety comparison ratio gauge (D2,500 per bag baseline)
     const COST_PER_RICE_BAG = 2500;
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
         calculations: {
             originalIncome: income,
             deductedSpend: spend,
-            remainingNetIncome: netIncome
+            remainingNetIncome: rawBalance
         },
         budgetBuckets: {
             foodAndMaintenance: foodAllocation,
