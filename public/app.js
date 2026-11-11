@@ -239,3 +239,52 @@ window.addEventListener('click', (e) => {
         resultModal.style.display = 'none';
     }
 });
+
+// Smart Auto-Hiding Download / Install App Prompt
+let deferredInstallPrompt = null;
+const installBanner = document.getElementById('install-banner');
+const installAppBtn = document.getElementById('install-app-btn');
+const dismissInstallBtn = document.getElementById('dismiss-install-btn');
+const installSubtext = document.getElementById('install-subtext');
+
+// Check if app is already installed and running from Home Screen
+const isAlreadyInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+if (!isAlreadyInstalled && installBanner) {
+    // 1. Android / Chrome / Edge native install prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+        installBanner.style.display = 'flex';
+    });
+
+    installAppBtn.addEventListener('click', async () => {
+        if (!deferredInstallPrompt) return;
+        deferredInstallPrompt.prompt();
+        const { outcome } = await deferredInstallPrompt.userChoice;
+        if (outcome === 'accepted') {
+            installBanner.style.display = 'none';
+        }
+        deferredInstallPrompt = null;
+    });
+
+    // Permanently hide banner once installation finishes
+    window.addEventListener('appinstalled', () => {
+        installBanner.style.display = 'none';
+        deferredInstallPrompt = null;
+    });
+
+    // 2. iPhone / iPad Safari helper (since Safari has no automatic install button)
+    const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+    if (isIOS) {
+        installAppBtn.style.display = 'none';
+        installSubtext.innerText = 'Tap Share (⎋) at the bottom, then "Add to Home Screen"';
+        installBanner.style.display = 'flex';
+    }
+
+    // Allow user to dismiss the banner for the current session
+    dismissInstallBtn.addEventListener('click', () => {
+        installBanner.style.display = 'none';
+    });
+}
+
