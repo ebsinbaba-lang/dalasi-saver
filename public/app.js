@@ -241,23 +241,81 @@ window.addEventListener('click', (e) => {
 });
 
 // Register Service Worker for Offline & Home Screen App Support
+// 1. Register Service Worker for Offline & Cross-Device App Installation
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(() => {});
+        navigator.serviceWorker.register('/sw.js')
+            .then(reg => reg.update())
+            .catch(() => {});
     });
 }
 
-// Home Screen Install Banner (Auto-hides once installed on Home Screen)
+// 2. Generate a Guaranteed Square 512x512 PNG Manifest Icon from /icon.png
+// (Fixes rectangular image rejection in Chrome/Edge on Laptop, Android & iPad)
+(function ensureSquareManifestIcon() {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 512;
+        const ctx = canvas.getContext('2d');
+
+        // Fill dark navy background matching your icon
+        ctx.fillStyle = '#050d1a';
+        ctx.fillRect(0, 0, 512, 512);
+
+        // Center-crop image cleanly into a 512x512 square
+        const minSide = Math.min(img.width, img.height);
+        const sx = (img.width - minSide) / 2;
+        const sy = (img.height - minSide) / 2;
+        ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, 512, 512);
+
+        const squarePngUrl = canvas.toDataURL('image/png');
+
+        const manifestObj = {
+            name: 'Dalasi Saver',
+            short_name: 'Dalasi Saver',
+            description: 'Smart Local Budgeting & Wave Assistant for The Gambia',
+            start_url: window.location.origin + '/',
+            scope: window.location.origin + '/',
+            display: 'standalone',
+            orientation: 'portrait',
+            background_color: '#050d1a',
+            theme_color: '#050d1a',
+            icons: [
+                { src: squarePngUrl, sizes: '192x192', type: 'image/png', purpose: 'any' },
+                { src: squarePngUrl, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+            ]
+        };
+
+        const blob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+        const manifestUrl = URL.createObjectURL(blob);
+        const manifestLink = document.querySelector('link[rel="manifest"]');
+        if (manifestLink) {
+            manifestLink.href = manifestUrl;
+        }
+    };
+    img.src = '/icon.png?v=3';
+})();
+
+// 3. Cross-Device Download / Install Banner (Laptop, iPad, iPhone & Android)
 let deferredInstallPrompt = null;
 const installBanner = document.getElementById('install-banner');
 const installAppBtn = document.getElementById('install-app-btn');
 const dismissInstallBtn = document.getElementById('dismiss-install-btn');
+const INSTALLED_FLAG = 'dalasi_saver_installed_v1';
 
+// Hide banner if opened as an installed app OR already marked installed
 const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+if (isStandalone) {
+    localStorage.setItem(INSTALLED_FLAG, 'true');
+}
 
-if (!isStandalone && installBanner) {
+if (!isStandalone && localStorage.getItem(INSTALLED_FLAG) !== 'true' && installBanner) {
     installBanner.style.display = 'flex';
 
+    // Capture native one-click install prompt on Laptop (Chrome/Edge) & Android
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredInstallPrompt = e;
@@ -268,20 +326,26 @@ if (!isStandalone && installBanner) {
             deferredInstallPrompt.prompt();
             const { outcome } = await deferredInstallPrompt.userChoice;
             if (outcome === 'accepted') {
+                localStorage.setItem(INSTALLED_FLAG, 'true');
                 installBanner.style.display = 'none';
             }
             deferredInstallPrompt = null;
         } else {
-            const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
-            if (isIOS) {
-                alert('To add to your iPhone Home Screen:\n1. Tap the Share button (⎋) at the bottom of Safari.\n2. Tap "Add to Home Screen".');
+            // Device-specific 1-tap instructions for iPad, iPhone, or browsers without auto-prompt
+            const ua = window.navigator.userAgent;
+            const isAppleMobile = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+            if (isAppleMobile) {
+                alert('To install Dalasi Saver on your iPhone or iPad:\n\n1. Tap the Share button (⎋) in Safari.\n2. Scroll down and tap "Add to Home Screen".\n\nOnce added, open it from your Home Screen and the Download button will disappear!');
             } else {
-                alert('To add to your Home Screen:\n1. Tap the browser menu (⋮) in the top-right corner.\n2. Tap "Install app" or "Add to Home screen".');
+                alert('To install Dalasi Saver on your Laptop or Phone:\n\n• On Laptop (Chrome/Edge): Click the Install icon (⊕ or 💻) at the right end of your top address bar.\n• On Android: Tap the 3 dots (⋮) in the top-right corner and tap "Install app".');
             }
         }
     });
 
+    // Permanently hide banner once installation completes
     window.addEventListener('appinstalled', () => {
+        localStorage.setItem(INSTALLED_FLAG, 'true');
         installBanner.style.display = 'none';
         deferredInstallPrompt = null;
     });
