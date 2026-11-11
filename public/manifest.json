@@ -1,17 +1,19 @@
 {
-  "short_name": "DalasiSaver",
-  "name": "Dalasi Saver - Smart Local Budgeting",
-  "icons": [
-    {
-            "src": "https://placehold.co",
-      "type": "image/png",
-      "sizes": "512x512",
-      "purpose": "any maskable"
-    }
-  ],
-  "start_url": "/index.html",
+  "name": "Dalasi Saver",
+  "short_name": "Dalasi Saver",
+  "description": "Smart Local Budgeting & Wave Assistant for The Gambia",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#1a2e40",
   "theme_color": "#1a2e40",
-  "display": "standalone",
-  "orientation": "portrait"
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://w3.org' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23CE1126'/%3E%3Cstop offset='33.3%25' stop-color='%23CE1126'/%3E%3Cstop offset='33.3%25' stop-color='%23FFFFFF'/%3E%3Cstop offset='38.9%25' stop-color='%23FFFFFF'/%3E%3Cstop offset='38.9%25' stop-color='%230C1C8C'/%3E%3Cstop offset='61.1%25' stop-color='%230C1C8C'/%3E%3Cstop offset='61.1%25' stop-color='%23FFFFFF'/%3E%3Cstop offset='66.7%25' stop-color='%23FFFFFF'/%3E%3Cstop offset='66.7%25' stop-color='%233A7728'/%3E%3Cstop offset='100%25' stop-color='%233A7728'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='110' fill='%231a2e40'/%3E%3Ccircle cx='256' cy='256' r='205' fill='%23ffffff'/%3E%3Ctext x='262' y='355' text-anchor='middle' font-family='Arial, Helvetica, sans-serif' font-size='295' font-weight='900' fill='url(%23g)'%3ED%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192 512x512 any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }
