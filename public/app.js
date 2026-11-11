@@ -247,11 +247,9 @@ const installAppBtn = document.getElementById('install-app-btn');
 const dismissInstallBtn = document.getElementById('dismiss-install-btn');
 const installSubtext = document.getElementById('install-subtext');
 
-// Check if app is already installed and running from Home Screen
 const isAlreadyInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
 if (!isAlreadyInstalled && installBanner) {
-    // 1. Android / Chrome / Edge native install prompt
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredInstallPrompt = e;
@@ -268,13 +266,11 @@ if (!isAlreadyInstalled && installBanner) {
         deferredInstallPrompt = null;
     });
 
-    // Permanently hide banner once installation finishes
     window.addEventListener('appinstalled', () => {
         installBanner.style.display = 'none';
         deferredInstallPrompt = null;
     });
 
-    // 2. iPhone / iPad Safari helper (since Safari has no automatic install button)
     const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
     if (isIOS) {
         installAppBtn.style.display = 'none';
@@ -282,9 +278,11 @@ if (!isAlreadyInstalled && installBanner) {
         installBanner.style.display = 'flex';
     }
 
-    // Allow user to dismiss the banner for the current session
     dismissInstallBtn.addEventListener('click', () => {
         installBanner.style.display = 'none';
     });
 }
 
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
