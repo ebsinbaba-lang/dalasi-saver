@@ -241,6 +241,7 @@ window.addEventListener('click', (e) => {
 });
 
 // Smart Auto-Hiding Download / Install App Prompt
+// Smart Auto-Hiding Download / Install App Prompt
 let deferredInstallPrompt = null;
 const installBanner = document.getElementById('install-banner');
 const installAppBtn = document.getElementById('install-app-btn');
@@ -250,33 +251,39 @@ const installSubtext = document.getElementById('install-subtext');
 const isAlreadyInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
 if (!isAlreadyInstalled && installBanner) {
+    // Show the download banner right away in browser mode
+    installBanner.style.display = 'flex';
+
+    // Capture Chrome/Android native install prompt if available
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredInstallPrompt = e;
-        installBanner.style.display = 'flex';
     });
 
     installAppBtn.addEventListener('click', async () => {
-        if (!deferredInstallPrompt) return;
-        deferredInstallPrompt.prompt();
-        const { outcome } = await deferredInstallPrompt.userChoice;
-        if (outcome === 'accepted') {
-            installBanner.style.display = 'none';
+        if (deferredInstallPrompt) {
+            deferredInstallPrompt.prompt();
+            const { outcome } = await deferredInstallPrompt.userChoice;
+            if (outcome === 'accepted') {
+                installBanner.style.display = 'none';
+            }
+            deferredInstallPrompt = null;
+        } else {
+            // Clear manual instructions for iPhone Safari or browsers without auto-prompt
+            const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+            if (isIOS) {
+                alert('To download on iPhone:\n1. Tap the Share button (⎋) at the bottom of Safari.\n2. Scroll down and tap "Add to Home Screen".');
+            } else {
+                alert('To download onto your phone:\n1. Tap the browser menu (⋮) in the top-right corner.\n2. Tap "Install app" or "Add to Home screen".');
+            }
         }
-        deferredInstallPrompt = null;
     });
 
+    // Permanently hide banner once installation finishes
     window.addEventListener('appinstalled', () => {
         installBanner.style.display = 'none';
         deferredInstallPrompt = null;
     });
-
-    const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
-    if (isIOS) {
-        installAppBtn.style.display = 'none';
-        installSubtext.innerText = 'Tap Share (⎋) at the bottom, then "Add to Home Screen"';
-        installBanner.style.display = 'flex';
-    }
 
     dismissInstallBtn.addEventListener('click', () => {
         installBanner.style.display = 'none';
