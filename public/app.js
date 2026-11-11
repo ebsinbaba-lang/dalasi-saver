@@ -240,56 +240,68 @@ window.addEventListener('click', (e) => {
     }
 });
 
-// Smart Auto-Hiding Download / Install App Prompt
-// Smart Auto-Hiding Download / Install App Prompt
-let deferredInstallPrompt = null;
+// Direct File Download (Saves standalone Dalasi-Saver.html to Downloads folder)
 const installBanner = document.getElementById('install-banner');
 const installAppBtn = document.getElementById('install-app-btn');
 const dismissInstallBtn = document.getElementById('dismiss-install-btn');
-const installSubtext = document.getElementById('install-subtext');
 
-const isAlreadyInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+// Detect if opened from a local downloaded file or standalone mode
+const isLocalFile = window.location.protocol === 'file:';
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
-if (!isAlreadyInstalled && installBanner) {
-    // Show the download banner right away in browser mode
+if (!isLocalFile && !isStandalone && installBanner) {
     installBanner.style.display = 'flex';
 
-    // Capture Chrome/Android native install prompt if available
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredInstallPrompt = e;
-    });
-
     installAppBtn.addEventListener('click', async () => {
-        if (deferredInstallPrompt) {
-            deferredInstallPrompt.prompt();
-            const { outcome } = await deferredInstallPrompt.userChoice;
-            if (outcome === 'accepted') {
-                installBanner.style.display = 'none';
-            }
-            deferredInstallPrompt = null;
-        } else {
-            // Clear manual instructions for iPhone Safari or browsers without auto-prompt
-            const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
-            if (isIOS) {
-                alert('To download on iPhone:\n1. Tap the Share button (⎋) at the bottom of Safari.\n2. Scroll down and tap "Add to Home Screen".');
-            } else {
-                alert('To download onto your phone:\n1. Tap the browser menu (⋮) in the top-right corner.\n2. Tap "Install app" or "Add to Home screen".');
-            }
-        }
-    });
+        installAppBtn.innerText = 'Downloading...';
+        try {
+            const [cssRes, jsRes] = await Promise.all([
+                fetch('/style.css'),
+                fetch('/app.js')
+            ]);
+            const cssText = await cssRes.text();
+            const jsText = await jsRes.text();
 
-    // Permanently hide banner once installation finishes
-    window.addEventListener('appinstalled', () => {
-        installBanner.style.display = 'none';
-        deferredInstallPrompt = null;
+            // Clone current page and bundle CSS + JS inline for 100% offline use
+            const docClone = document.documentElement.cloneNode(true);
+            const bannerInClone = docClone.querySelector('#install-banner');
+            if (bannerInClone) bannerInClone.remove();
+
+            const extCss = docClone.querySelector('link[href="/style.css"]');
+            if (extCss) {
+                const inlineStyle = document.createElement('style');
+                inlineStyle.textContent = cssText;
+                extCss.replaceWith(inlineStyle);
+            }
+
+            const extScript = docClone.querySelector('script[src="/app.js"]');
+            if (extScript) {
+                const inlineScript = document.createElement('script');
+                inlineScript.textContent = jsText;
+                extScript.replaceWith(inlineScript);
+            }
+
+            const fullHtml = '<!DOCTYPE html>\n' + docClone.outerHTML;
+            const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
+            const downloadUrl = URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = 'Dalasi-Saver.html';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(downloadUrl);
+
+            installBanner.style.display = 'none';
+        } catch (err) {
+            alert('Download failed. Please check your connection and try again.');
+        } finally {
+            installAppBtn.innerText = 'Download';
+        }
     });
 
     dismissInstallBtn.addEventListener('click', () => {
         installBanner.style.display = 'none';
     });
-}
-
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
 }
