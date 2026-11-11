@@ -70,7 +70,118 @@
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 18px;
+        }
+
+        /* Active Saved Balance Banner */
+        .saved-banner {
+            display: none;
+            background: #ebf8ff;
+            border: 2px solid #3182ce;
+            border-radius: 14px;
+            padding: 14px 16px;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .saved-banner.negative {
+            background: #fff5f5;
+            border-color: #e53e3e;
+        }
+
+        .saved-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .saved-info small {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .saved-info strong {
+            font-size: 20px;
+            color: #1a2e40;
+            letter-spacing: 0.5px;
+        }
+
+        .saved-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            padding-top: 8px;
+        }
+
+        /* Show / Hide Toggle Switch */
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #4a5568;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 38px;
+            height: 20px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e0;
+            transition: 0.25s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.25s;
+            border-radius: 50%;
+        }
+
+        .switch input:checked + .slider {
+            background-color: #2b8a3e;
+        }
+
+        .switch input:checked + .slider:before {
+            transform: translateX(18px);
+        }
+
+        .btn-reset {
+            background: #ffffff;
+            border: 1px solid #cbd5e0;
+            color: #4a5568;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 5px 10px;
+            border-radius: 8px;
+            cursor: pointer;
         }
 
         .input-group {
@@ -173,7 +284,7 @@
             border-top-right-radius: 28px;
             padding: 30px 24px;
             box-shadow: 0 -4px 25px rgba(0,0,0,0.15);
-            max-height: 85vh;
+            max-height: 88vh;
             overflow-y: auto;
         }
 
@@ -203,8 +314,8 @@
         .metrics-grid {
             display: flex;
             flex-direction: column;
-            gap: 14px;
-            margin-bottom: 24px;
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
         .metric-card {
@@ -233,6 +344,51 @@
             font-weight: 700;
             color: #1a2e40;
         }
+
+        /* Save or Cancel Action Prompt */
+        .save-prompt-box {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .save-prompt-box p {
+            font-size: 13px;
+            color: #4a5568;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .prompt-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-save {
+            flex: 1;
+            background: #1a2e40;
+            color: #ffffff;
+            border: none;
+            padding: 13px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            background: #edf2f7;
+            color: #4a5568;
+            border: none;
+            padding: 13px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -245,70 +401,3 @@
         </div>
 
         <div class="content-body">
-            <div class="input-group">
-                <label for="monthly-income">Your Monthly Income (GMD)</label>
-                <input type="number" id="monthly-income" class="input-field" placeholder="Example: 15000" min="0">
-            </div>
-
-            <!-- Transport Fares -->
-            <div style="display: flex; gap: 12px; background: #edf2f7; padding: 12px; border-radius: 12px;">
-                <div class="input-group" style="flex: 1;">
-                    <label style="font-size: 12px; font-weight:600; color:#4a5568;">➡️ One-Way Fare (D)</label>
-                    <input type="number" id="oneway-fare" class="input-field" placeholder="e.g. 50" min="0">
-                </div>
-                <div class="input-group" style="flex: 1;">
-                    <label style="font-size: 12px; font-weight:600; color:#4a5568;">↩️ Return Fare (D)</label>
-                    <input type="number" id="return-fare" class="input-field" placeholder="e.g. 50" min="0">
-                </div>
-            </div>
-
-            <!-- Optional Monthly Rent & Weekly Cashpower -->
-            <div style="display: flex; gap: 12px; background: #edf2f7; padding: 12px; border-radius: 12px;">
-                <div class="input-group" style="flex: 1;">
-                    <label for="monthly-rent" style="font-size: 12px; font-weight:600; color:#4a5568;">🏠 Monthly Rent (Optional)</label>
-                    <input type="number" id="monthly-rent" class="input-field" placeholder="e.g. 5000" min="0">
-                </div>
-                <div class="input-group" style="flex: 1;">
-                    <label for="weekly-cashpower" style="font-size: 12px; font-weight:600; color:#4a5568;">⚡ Weekly Cashpower (D)</label>
-                    <input type="number" id="weekly-cashpower" class="input-field" placeholder="e.g. 500" min="0">
-                </div>
-            </div>
-
-            <div class="input-group">
-                <label for="daily-fishmoney">🐟 Daily Fish Money Target (GMD)</label>
-                <input type="number" id="daily-fishmoney" class="input-field" placeholder="Example: 400 a day" min="0">
-            </div>
-
-            <div class="input-group">
-                <label for="manual-spend">New Cash Spending Item (GMD)</label>
-                <input type="number" id="manual-spend" class="input-field" placeholder="Example: 150 for lunch" min="0">
-            </div>
-
-            <div class="wave-section">
-                <label>🔵 Paste Wave SMS Text Snippet</label>
-                <textarea id="wave-sms-input" class="wave-textarea" placeholder="Paste the confirmation text from Wave here..."></textarea>
-                <div id="wave-status" class="wave-status"></div>
-            </div>
-
-            <button type="button" class="btn-primary" id="calculate-btn">📊 Run Spending Analysis</button>
-        </div>
-    </div>
-
-    <div id="result-modal" class="modal-overlay">
-        <div class="modal-sheet">
-            <div class="modal-header">
-                <div class="modal-title">Your Savings Plan</div>
-                <button class="close-btn" id="close-modal-btn">&times;</button>
-            </div>
-
-            <div class="metrics-grid">
-                <div class="metric-card" id="balance-card">
-                    <span class="metric-label">Remaining Salary Balance</span>
-                    <span class="metric-val" id="res-balance">D0</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-label">Food & Basic Maintenance</span>
-                    <span class="metric-val" id="res-food">D0</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-label">Family Fish Money Allocation</span>
