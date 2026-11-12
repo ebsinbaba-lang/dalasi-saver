@@ -494,3 +494,111 @@ body {
     cursor: pointer;
     padding: 4px;
 }
+
+/* === COMPACT MOBILE VIEW OVERRIDES === */
+.app-header.compact-header {
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-align: left;
+    border-bottom-left-radius: 18px;
+    border-bottom-right-radius: 18px;
+}
+
+.header-logo-sm {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e2e8f0;
+    flex-shrink: 0;
+}
+
+.app-header.compact-header h1 {
+    font-size: 20px;
+}
+
+.app-header.compact-header p {
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.content-body {
+    padding: 14px 16px;
+    gap: 11px;
+}
+
+.saved-banner {
+    padding: 10px 14px;
+    gap: 6px;
+}
+
+.saved-info strong {
+    font-size: 18px;
+}
+
+.input-group {
+    gap: 5px;
+}
+
+.input-group label {
+    font-size: 13px;
+}
+
+.input-field {
+    padding: 10px 12px;
+    font-size: 14px;
+    border-radius: 10px;
+}
+
+.row-box {
+    padding: 9px 10px;
+    gap: 10px;
+}
+
+.drawer-toggle-btn {
+    width: 100%;
+    background: #edf2f7;
+    border: 1px solid #cbd5e0;
+    color: #1a2e40;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.bills-drawer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.bills-drawer.collapsed {
+    display: none;
+}
+
+.wave-section {
+    padding: 11px 12px;
+    margin-top: 0;
+}
+
+.wave-textarea {
+    height: 50px;
+    margin-top: 6px;
+    padding: 8px;
+}
+
+.wave-status {
+    margin-top: 5px;
+}
+
+.btn-primary {
+    padding: 13px;
+    font-size: 15px;
+}
