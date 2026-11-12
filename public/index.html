@@ -32,29 +32,27 @@
 </head>
 <body>
 
-    <div class="phone-container">
-        <div class="app-header">
-    <div class="app-logo">
-    <img src="/icon.png?v=2" alt="Dalasi Saver Logo" style="width: 68px; height: 68px; border-radius: 50%; object-fit: cover; border: 2px solid #e2e8f0;">
-</div>
-
-    <h1>Dalasi Saver</h1>
-    <p>Smart Local Budgeting & Wave Assistant</p>
-</div>
+        <div class="phone-container">
+        <div class="app-header compact-header">
+            <img src="/icon.png?v=2" alt="Dalasi Saver Logo" class="header-logo-sm">
+            <div class="header-text">
+                <h1>Dalasi Saver</h1>
+                <p>Smart Local Budgeting & Wave Assistant</p>
+            </div>
+        </div>
 
         <div class="content-body">
             <div class="install-banner" id="install-banner">
-    <div class="install-info">
-        <strong>📲 Download Dalasi Saver</strong>
-        <span id="install-subtext">Install on your phone for instant offline access</span>
-    </div>
-    <div class="install-actions">
-        <button type="button" class="btn-install" id="install-app-btn">Download</button>
-        <button type="button" class="btn-dismiss-install" id="dismiss-install-btn" aria-label="Close">&times;</button>
-    </div>
-</div>
+                <div class="install-info">
+                    <strong>📲 Download Dalasi Saver</strong>
+                    <span id="install-subtext">Install for instant offline access</span>
+                </div>
+                <div class="install-actions">
+                    <button type="button" class="btn-install" id="install-app-btn">Download</button>
+                    <button type="button" class="btn-dismiss-install" id="dismiss-install-btn" aria-label="Close">&times;</button>
+                </div>
+            </div>
 
-            
             <div class="saved-banner" id="saved-banner">
                 <div class="saved-top-row">
                     <div class="saved-info">
@@ -79,44 +77,51 @@
                 <input type="number" id="monthly-income" class="input-field" placeholder="Example: 15000" min="0">
             </div>
 
-            <div class="row-box">
-                <div class="input-group">
-                    <label for="oneway-fare">➡️ One-Way Fare (D)</label>
-                    <input type="number" id="oneway-fare" class="input-field" placeholder="e.g. 50" min="0">
-                </div>
-                <div class="input-group">
-                    <label for="return-fare">↩️ Return Fare (D)</label>
-                    <input type="number" id="return-fare" class="input-field" placeholder="e.g. 50" min="0">
-                </div>
-            </div>
+            <button type="button" class="drawer-toggle-btn" id="toggle-bills-drawer">
+                <span>⚙️ Monthly Bills, Transport & Food</span>
+                <span id="drawer-arrow">▾</span>
+            </button>
 
-            <div class="row-box">
-                <div class="input-group" style="flex: 0.9;">
-                    <label for="monthly-rent">🏠 Monthly Rent</label>
-                    <input type="number" id="monthly-rent" class="input-field" placeholder="Optional" min="0">
-                </div>
-                <div class="input-group" style="flex: 1.2;">
-                    <label for="cashpower-amount">⚡ Cashpower (D)</label>
-                    <input type="number" id="cashpower-amount" class="input-field" placeholder="e.g. 500" min="0">
-                    <div class="cashpower-prompt-box">
-                        <span class="cashpower-prompt-title">Is Cashpower Weekly or Daily?</span>
-                        <div class="freq-pills">
-                            <button type="button" class="freq-btn active" id="freq-weekly">Weekly</button>
-                            <button type="button" class="freq-btn" id="freq-daily">Daily</button>
-                        </div>
-                        <span class="freq-feedback" id="freq-feedback">✓ Weekly Cashpower selected</span>
+            <div class="bills-drawer" id="bills-drawer">
+                <div class="row-box">
+                    <div class="input-group">
+                        <label for="oneway-fare">➡️ One-Way Fare (D)</label>
+                        <input type="number" id="oneway-fare" class="input-field" placeholder="e.g. 50" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label for="return-fare">↩️ Return Fare (D)</label>
+                        <input type="number" id="return-fare" class="input-field" placeholder="e.g. 50" min="0">
                     </div>
                 </div>
-            </div>
 
-            <div class="row-box">
-                <div class="input-group">
-                    <label for="daily-fishmoney">🐟 Daily Fish Money</label>
-                    <input type="number" id="daily-fishmoney" class="input-field" placeholder="e.g. 400" min="0">
+                <div class="row-box">
+                    <div class="input-group" style="flex: 0.9;">
+                        <label for="monthly-rent">🏠 Monthly Rent</label>
+                        <input type="number" id="monthly-rent" class="input-field" placeholder="Optional" min="0">
+                    </div>
+                    <div class="input-group" style="flex: 1.2;">
+                        <label for="cashpower-amount">⚡ Cashpower (D)</label>
+                        <input type="number" id="cashpower-amount" class="input-field" placeholder="e.g. 500" min="0">
+                        <div class="cashpower-prompt-box">
+                            <span class="cashpower-prompt-title">Weekly or Daily?</span>
+                            <div class="freq-pills">
+                                <button type="button" class="freq-btn active" id="freq-weekly">Weekly</button>
+                                <button type="button" class="freq-btn" id="freq-daily">Daily</button>
+                            </div>
+                            <span class="freq-feedback" id="freq-feedback">✓ Weekly selected</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="input-group">
-                    <label for="food-maintenance">🍚 Food & Upkeep</label>
-                    <input type="number" id="food-maintenance" class="input-field" placeholder="e.g. 4000" min="0">
+
+                <div class="row-box">
+                    <div class="input-group">
+                        <label for="daily-fishmoney">🐟 Daily Fish Money</label>
+                        <input type="number" id="daily-fishmoney" class="input-field" placeholder="e.g. 400" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label for="food-maintenance">🍚 Food & Upkeep</label>
+                        <input type="number" id="food-maintenance" class="input-field" placeholder="e.g. 4000" min="0">
+                    </div>
                 </div>
             </div>
 
@@ -186,3 +191,8 @@
     <script src="/app.js"></script>
 </body>
 </html>
+
+    
+   
+          
+              
