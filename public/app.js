@@ -105,6 +105,23 @@ function clearEntryFields() {
 
 refreshSavedBanner();
 
+const toggleBillsDrawerBtn = document.getElementById('toggle-bills-drawer');
+const billsDrawer = document.getElementById('bills-drawer');
+const drawerArrow = document.getElementById('drawer-arrow');
+
+if (toggleBillsDrawerBtn && billsDrawer) {
+    const saved = getSavedLedger();
+    if (saved && typeof saved.remainingBalance === 'number') {
+        billsDrawer.classList.add('collapsed');
+        drawerArrow.innerText = '▸';
+    }
+    toggleBillsDrawerBtn.addEventListener('click', () => {
+        const isCollapsed = billsDrawer.classList.toggle('collapsed');
+        drawerArrow.innerText = isCollapsed ? '▸' : '▾';
+    });
+}
+
+
 resetStorageBtn.addEventListener('click', () => {
     if (confirm('Clear your saved balance and start fresh?')) {
         localStorage.removeItem(STORAGE_KEY);
