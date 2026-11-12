@@ -282,7 +282,7 @@ if (!isStandalone && localStorage.getItem(INSTALLED_FLAG) !== 'true' && installB
 if (installAppBtn) {
     installAppBtn.addEventListener('click', async () => {
         if (deferredInstallPrompt) {
-            // Triggers native 1-click install prompt on Android & Desktop Chrome/Edge
+            // Triggers native 1-click install prompt on Android Chrome & Laptop
             deferredInstallPrompt.prompt();
             const { outcome } = await deferredInstallPrompt.userChoice;
             if (outcome === 'accepted') {
@@ -291,18 +291,24 @@ if (installAppBtn) {
             }
             deferredInstallPrompt = null;
         } else {
-            // Device-specific fallback instructions for iPhone/iPad or browsers without auto-prompt
             const ua = window.navigator.userAgent;
             const isAppleMobile = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            const isInAppBrowser = /FBAN|FBAV|Instagram|WhatsApp|TikTok|BytedanceWebview|wv\)/i.test(ua);
+            const isSamsungBrowser = /SamsungBrowser/i.test(ua);
 
-            if (isAppleMobile) {
-                alert('To install Dalasi Saver on your iPhone or iPad:\n\n1. Tap the Share button (⎋) in Safari.\n2. Scroll down and tap "Add to Home Screen".\n\nOnce added, open it from your Home Screen and the Download button will disappear!');
+            if (isInAppBrowser) {
+                alert('⚠️ You opened this link inside WhatsApp or Social Media.\n\nTo install Dalasi Saver:\n1. Tap the 3 dots (⋮) at the top-right.\n2. Tap "Open in Chrome" (or "Open in browser").\n3. Tap Download again!');
+            } else if (isSamsungBrowser) {
+                alert('📲 Install Dalasi Saver on Samsung Internet:\n\n1. Tap the menu icon (⋮ or ≡) at the bottom.\n2. Tap "Add page to" → "Home screen".\n3. If Play Protect pops up, tap "More details" → "Install anyway" (or open this link in Google Chrome for instant install).');
+            } else if (isAppleMobile) {
+                alert('📲 Install Dalasi Saver on iPhone or iPad:\n\n1. Tap the Share button (⎋) in Safari.\n2. Scroll down and tap "Add to Home Screen".');
             } else {
-                alert('To install Dalasi Saver on your Laptop or Phone:\n\n• On Laptop (Chrome/Edge): Click the Install icon (⊕ or 💻) at the right end of your top address bar.\n• On Android: Tap the 3 dots (⋮) in the top-right corner and tap "Install app".');
+                alert('📲 To install Dalasi Saver:\n\n• On Laptop (Chrome/Edge): Click the Install icon (⊕ or 💻) at the right end of your top address bar.\n• On Android Chrome: Tap the 3 dots (⋮) at the top-right and tap "Install app".');
             }
         }
     });
 }
+
 
 // Permanently hide banner once installation completes
 window.addEventListener('appinstalled', () => {
