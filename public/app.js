@@ -242,6 +242,7 @@ window.addEventListener('click', (e) => {
 
 // Register Service Worker for Offline & Home Screen App Support
 // 1. Register Service Worker for Offline & Cross-Device App Installation
+// 1. Register Service Worker immediately
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
@@ -250,63 +251,23 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-// 2. Generate a Guaranteed Square 512x512 PNG Manifest Icon from /icon.png
-// (Fixes rectangular image rejection in Chrome/Edge on Laptop, Android & iPad)
-(function ensureSquareManifestIcon() {
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = 512;
-        canvas.height = 512;
-        const ctx = canvas.getContext('2d');
-
-        // Fill dark navy background matching your icon
-        ctx.fillStyle = '#050d1a';
-        ctx.fillRect(0, 0, 512, 512);
-
-        // Center-crop image cleanly into a 512x512 square
-        const minSide = Math.min(img.width, img.height);
-        const sx = (img.width - minSide) / 2;
-        const sy = (img.height - minSide) / 2;
-        ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, 512, 512);
-
-        const squarePngUrl = canvas.toDataURL('image/png');
-
-        const manifestObj = {
-            name: 'Dalasi Saver',
-            short_name: 'Dalasi Saver',
-            description: 'Smart Local Budgeting & Wave Assistant for The Gambia',
-            start_url: window.location.origin + '/',
-            scope: window.location.origin + '/',
-            display: 'standalone',
-            orientation: 'portrait',
-            background_color: '#050d1a',
-            theme_color: '#050d1a',
-            icons: [
-                { src: squarePngUrl, sizes: '192x192', type: 'image/png', purpose: 'any' },
-                { src: squarePngUrl, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
-            ]
-        };
-
-        const blob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
-        const manifestUrl = URL.createObjectURL(blob);
-        const manifestLink = document.querySelector('link[rel="manifest"]');
-        if (manifestLink) {
-            manifestLink.href = manifestUrl;
-        }
-    };
-    img.src = '/icon.png?v=3';
-})();
-
-// 3. Cross-Device Download / Install Banner (Laptop, iPad, iPhone & Android)
+// 2. Cross-Device Download / Install Banner (Laptop, iPad, iPhone & Android)
 let deferredInstallPrompt = null;
 const installBanner = document.getElementById('install-banner');
 const installAppBtn = document.getElementById('install-app-btn');
 const dismissInstallBtn = document.getElementById('dismiss-install-btn');
 const INSTALLED_FLAG = 'dalasi_saver_installed_v1';
 
-// Hide banner if opened as an installed app OR already marked installed
+// Always listen for native install prompt right away
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    if (installBanner && !isStandalone) {
+        installBanner.style.display = 'flex';
+    }
+});
+
+// Check if already opened as an installed standalone app
 const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 if (isStandalone) {
     localStorage.setItem(INSTALLED_FLAG, 'true');
@@ -314,24 +275,23 @@ if (isStandalone) {
 
 if (!isStandalone && localStorage.getItem(INSTALLED_FLAG) !== 'true' && installBanner) {
     installBanner.style.display = 'flex';
+} else if (installBanner) {
+    installBanner.style.display = 'none';
+}
 
-    // Capture native one-click install prompt on Laptop (Chrome/Edge) & Android
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredInstallPrompt = e;
-    });
-
+if (installAppBtn) {
     installAppBtn.addEventListener('click', async () => {
         if (deferredInstallPrompt) {
+            // Triggers native 1-click install prompt on Android & Desktop Chrome/Edge
             deferredInstallPrompt.prompt();
             const { outcome } = await deferredInstallPrompt.userChoice;
             if (outcome === 'accepted') {
                 localStorage.setItem(INSTALLED_FLAG, 'true');
-                installBanner.style.display = 'none';
+                if (installBanner) installBanner.style.display = 'none';
             }
             deferredInstallPrompt = null;
         } else {
-            // Device-specific 1-tap instructions for iPad, iPhone, or browsers without auto-prompt
+            // Device-specific fallback instructions for iPhone/iPad or browsers without auto-prompt
             const ua = window.navigator.userAgent;
             const isAppleMobile = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
@@ -342,15 +302,17 @@ if (!isStandalone && localStorage.getItem(INSTALLED_FLAG) !== 'true' && installB
             }
         }
     });
+}
 
-    // Permanently hide banner once installation completes
-    window.addEventListener('appinstalled', () => {
-        localStorage.setItem(INSTALLED_FLAG, 'true');
-        installBanner.style.display = 'none';
-        deferredInstallPrompt = null;
-    });
+// Permanently hide banner once installation completes
+window.addEventListener('appinstalled', () => {
+    localStorage.setItem(INSTALLED_FLAG, 'true');
+    if (installBanner) installBanner.style.display = 'none';
+    deferredInstallPrompt = null;
+});
 
+if (dismissInstallBtn) {
     dismissInstallBtn.addEventListener('click', () => {
-        installBanner.style.display = 'none';
+        if (installBanner) installBanner.style.display = 'none';
     });
 }
